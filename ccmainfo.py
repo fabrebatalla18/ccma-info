@@ -145,9 +145,13 @@ def main():
         logger.debug("Going for multiple data.")
         # HEADER
         try:
-            txt_file.append("{} {}".format(show, j['informacio']['capitol']))
+            txt_file.append("{} {} ({})".format(show, j['informacio']['capitol'],
+                                           j['audiencies']['kantarst']['parametres']['ns_st_ddt']))
         except KeyError:
-            txt_file.append(show)
+            try:
+                txt_file.append("{} {}".format(show, j['informacio']['capitol']))
+            except KeyError:
+                txt_file.append(show)
         # INFO
         txt_file.append("{}: {}".format(INFO_LINK, "{}{}".format(name_urlbase, capi)))
 

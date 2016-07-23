@@ -93,3 +93,4 @@ ENV/
 
 # CCMAINFO temporary list
 ccmainfo.json
+*.txt
