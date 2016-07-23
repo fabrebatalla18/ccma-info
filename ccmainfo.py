@@ -22,6 +22,10 @@ hq_urlbase = "http://www.tv3.cat/pvideo/FLV_bbd_media.jsp?QUALITY=H&PROFILE=IPTV
 subs1_urlbase = "http://dinamics.ccma.cat/pvideo/media.jsp?media=video&version=0s&profile=tv&idint="
 subs2_urlbase = "http://www.tv3.cat/p3ac/p3acOpcions.jsp?idint="
 
+SUPER3_URL = "www.ccma.cat/tv3/super3/"
+SUPER3_FILTER = "media-object"
+TV3_URL = "www.ccma.cat/tv3/alacarta/"
+TV3_FILTER = "F-capsaImatge"
 
 ###########
 # Logging
@@ -52,7 +56,15 @@ def get_url(args):
         url = input("Write your URL: ")
     else:
         url = args.batch
-    return url
+    if url.find(SUPER3_URL) > -1:
+        logger.debug("SUPER3 link")
+        return url, SUPER3_FILTER
+    elif url.find(TV3_URL) > -1:
+        logger.debug("TV3 link")
+        return url, TV3_FILTER
+    else:
+        logger.error("Given URL is not supported.")
+        sys.exit(5)
 
 
 def load_json():
@@ -88,14 +100,14 @@ def main():
     args = cli_parse()
     if args.verbose:
         logger.setLevel(logging.DEBUG)
-    url = get_url(args)
+    url, parse_filter = get_url(args)
     js = load_json()
 
     html_doc = requests.get(url).text
     soup = bs4.BeautifulSoup(html_doc, 'html.parser')
     logger.info("Parsing URL {}".format(url))
     try:
-        capis_meta = soup.find_all('a', class_="media-object")
+        capis_meta = soup.find_all('a', class_=parse_filter)
         for capi_meta in capis_meta:
             p = re.compile('/video/([0-9]{7})/$')
             capis.append(p.search(capi_meta['href']).group(1))
